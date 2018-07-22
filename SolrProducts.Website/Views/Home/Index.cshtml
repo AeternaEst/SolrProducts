@@ -1,0 +1,284 @@
+﻿@model int?
+
+<h3>Search</h3>
+<input type="text" id="search" placeholder="enter searchwords"/>
+
+<h4>Results</h4>Total: <span class="total-results"></span>
+
+<div class="row facets" style="margin-left: 10px;">
+
+</div>
+
+<div class="row sorting" style="margin-left: 10px;">
+    
+</div>
+
+<div custom class="row results">
+
+</div>
+
+<div class="pagination">
+    <p class="prev">Prev</p>
+    <p class="next">Next</p>    
+</div>
+
+
+<script>
+    var xmlHttpRequest = new XMLHttpRequest();
+    var baseSearchUrl = 'http://localhost:60768/search';
+    xmlHttpRequest.addEventListener('load', function(e) {
+        handleSearchResponse(e);
+    });
+    var filters = [];
+    var searchText = '';
+
+    var searchTextInput = document.getElementById('search');
+    searchTextInput.addEventListener('keypress', function (e) {
+        if (e.code === 'Enter') {
+            currentPage = 1;
+            search();
+        }
+    }, false);
+
+    var totalResults;
+    var numToTake = @Model;
+    var currentPage = 1;
+    var paginationElements = document.querySelectorAll('.pagination p');
+    paginationElements.forEach(function(ele) {
+        ele.addEventListener('click', function (e) {
+            var targetClass = e.target.classList[0];
+            var goToPage = targetClass === 'prev' ? currentPage - 1 : currentPage + 1;
+
+            if (goToPage < 1 || (goToPage * numToTake - totalResults >= numToTake))
+                return;
+
+            currentPage = goToPage;
+
+            search();
+        }, false);
+    });
+
+    var selectedSortOrder;
+
+    search();
+
+    function handleSearchResponse(e) {
+        var stringResponse = e.target.response;
+        var response = JSON.parse(stringResponse);
+
+        if (response.Success) {
+            var totalResultsSpan = document.getElementsByClassName('total-results')[0];
+            totalResultsSpan.innerText = response.TotalResults;
+            totalResults = response.TotalResults;
+
+            var resultsDiv = document.getElementsByClassName('results')[0];
+            resultsDiv.innerHTML = '';
+
+            var results = response.Results;
+            if (results && results.length > 0) {
+                for (var i = 0; i < results.length; i++) {
+                    var resultContainer = createElement('div', '', resultsDiv, 'col-md-3');
+
+                    var resultUl = createElement('ul', '', resultContainer);
+                    createElement('li', results[i].Id, resultUl);
+                    createElement('li', results[i].Name, resultUl);
+                    createElement('li', results[i].Category, resultUl);
+                    createElement('li', results[i].Type, resultUl);
+                    createElement('li', results[i].Manufacture, resultUl);
+
+                    var descText = results[i].Description;
+                    if (response.Highlights) {
+                        var highlight = response.Highlights[i];
+                        if (highlight && highlight.Snippet && highlight.Snippet !== '') {
+                            var t = document.createElement('li');
+                            t.innerHTML = highlight.Snippet;
+                            resultUl.appendChild(t);
+                            //descText = highlight.Snippet;
+                        }
+                    } else {
+                        createElement('li', descText, resultUl);    
+                    }
+
+                    createElement('li', results[i].Price, resultUl);
+                    createElement('li', results[i].IntroDate, resultUl);
+
+                    resultContainer.appendChild(resultUl);
+
+                    resultsDiv.appendChild(resultContainer);
+                }
+            }
+
+            if (response.AvailableSorting.length > 0) {
+                var sortOrderDiv = document.getElementsByClassName('sorting')[0];
+                sortOrderDiv.innerHTML = '';
+
+                response.AvailableSorting.forEach(function(ele) {
+                    var sortContainer = document.createElement('div');
+                    sortOrderDiv.appendChild(sortContainer);
+
+                    var sortHeadline = document.createElement('p');
+                    sortHeadline.innerText = ele.SortField;
+                    sortContainer.appendChild(sortHeadline);
+
+                    var ascOption = document.createElement('input');
+                    ascOption.type = 'radio';
+                    ascOption.name = ele.SortField;
+                    ascOption.value = 'asc';
+                    ascOption.checked = selectedSortOrder && selectedSortOrder.sortField === ele.SortField && 
+                        selectedSortOrder.direction === 'asc';
+                    ascOption.addEventListener('click', function(e) {
+                        currentPage = 1;
+                        selectedSortOrder = {
+                            sortField: e.target.name,
+                            direction: e.target.value
+                        };
+                        search();
+                    }, false);
+                    sortContainer.appendChild(ascOption);
+                    var ascText = document.createElement('span');
+                    ascText.innerText = 'Ascending';
+                    sortContainer.appendChild(ascText);
+
+                    var descOption = document.createElement('input');
+                    descOption.type = 'radio';
+                    descOption.name = ele.SortField;
+                    descOption.value = 'desc';
+                    descOption.checked = selectedSortOrder && selectedSortOrder.sortField === ele.SortField && 
+                        selectedSortOrder.direction === 'desc';
+                    descOption.addEventListener('click', function(e) {
+                        currentPage = 1;
+                        selectedSortOrder = {
+                            sortField: e.target.name,
+                            direction: e.target.value
+                        };
+                        search();
+                    }, false);
+                    sortContainer.appendChild(descOption);
+                    var descText = document.createElement('span');
+                    descText.innerText = 'Descending';
+                    sortContainer.appendChild(descText);
+                });
+            }
+
+            var facetsDiv = document.getElementsByClassName('facets')[0];
+            facetsDiv.innerHTML = '';
+
+            var facets = response.FacetResults;
+            if (facets && facets.length > 0) {
+                for (var i = 0; i < facets.length; i++) {
+
+                    var selectEle = document.createElement('select');
+                    selectEle.setAttribute('multiple', '');
+                    var facetHeadline = document.createElement('option');
+                    facetHeadline.innerText = facets[i].FacetName;
+                    facetHeadline.setAttribute('disabled', '');
+                    selectEle.appendChild(facetHeadline);
+
+                    for (var j = 0; j < facets[i].Results.length; j++) {
+                        var optionEle = document.createElement('option');
+                        optionEle.innerText = facets[i].Results[j].Key + ' , ' + facets[i].Results[j].Value;
+                        optionEle.value = facets[i].Results[j].Key;
+                        optionEle.addEventListener('click', function (e) {
+                            currentPage = 1;
+                            var filterName = e.target.parentElement[0].value;
+
+                            var existingFilter;
+                            filters.forEach(function(f) {
+                                if (f.key === filterName) {
+                                    existingFilter = f;
+                                }
+                            });
+
+                            if (!existingFilter) {
+                                var filterValues = [];
+                                filterValues.push(e.target.value);
+                                var newFilter = {
+                                    key: filterName,
+                                    values: filterValues
+                                };
+                                filters.push(newFilter);
+                            } else {
+                                if (existingFilter.values.indexOf(e.target.value) === -1) {
+                                    existingFilter.values.push(e.target.value);
+                                } else {
+                                    existingFilter.values.pop(e.target.value);
+                                    if (existingFilter.values.length <= 0) {
+                                        for (var h = 0; h < filters.length; h++) {
+                                            if (filters[h].key === existingFilter.key) {
+                                                filters.splice(h, 1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            search();
+                        }, false);
+
+                        selectEle.appendChild(optionEle);
+                    }
+                    facetsDiv.appendChild(selectEle);
+                }
+            }
+        }
+    }
+
+    function filterExists(filter) {
+        return filter.key === 'type';
+    }
+
+    function createElement(type, text, parent, classes) {
+        var ele = document.createElement(type);
+        if (text) {
+            ele.innerText = text;
+        }
+        if (classes) {
+            ele.classList.add(classes);
+        }
+        parent.appendChild(ele);
+        return ele;
+    }
+
+    function search() {
+        var endpoint = baseSearchUrl + createSearchQuery();
+        xmlHttpRequest.open('GET', endpoint);
+        
+        xmlHttpRequest.send();    
+    }
+
+    function createSearchQuery() {
+        var queryString = '?';
+        var searchText = searchTextInput.value;
+        if (searchText) {
+            queryString += 'SearchText=' + searchText;
+        }
+        if (filters && filters.length > 0) {
+            queryString += appendAndToQuery(queryString) ? '&Filters=' : 'Filters=';
+            for (var i = 0; i < filters.length; i++) {
+                var filter = filters[i];
+                queryString += filter.key + '=';
+                for (var j = 0; j < filter.values.length; j++) {
+                    queryString += filter.values[j];
+                    if (j < filter.values.length - 1) {
+                        queryString += ',';
+                    }
+                }
+                if (i < filters.length - 1) {
+                    queryString += '|';
+                }
+            }
+        }
+        queryString += appendAndToQuery(queryString) ? '&Page=' + currentPage : 'Page=' + currentPage;
+
+        if (selectedSortOrder) {
+            queryString += appendAndToQuery(queryString) ? '&SortOrder=' +
+                selectedSortOrder.sortField + '=' + selectedSortOrder.direction : '';
+        }
+
+        return queryString;
+    }
+
+    function appendAndToQuery(queryString) {
+        return queryString.charAt(queryString.length - 1) !== '?';
+    }
+</script>

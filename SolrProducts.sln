@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolrProducts.Website", "SolrProducts.Website\SolrProducts.Website.csproj", "{0EC64833-F9EB-4CE9-996A-CF7B5CCD5E8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolrProducts.Logic", "SolrProducts.Logic\SolrProducts.Logic.csproj", "{2A4E27EF-3991-4AC6-A100-ADDDC6B289E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolrProducts.Search", "SolrProducts.Search\SolrProducts.Search.csproj", "{6CC5F613-C2D3-459C-94C2-F55963D0B24B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolrProducts.IoC.Ninject", "SolrProducts.IoC.Ninject\SolrProducts.IoC.Ninject.csproj", "{579F1D4C-E286-4468-9241-11A47A0BE3B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EC64833-F9EB-4CE9-996A-CF7B5CCD5E8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EC64833-F9EB-4CE9-996A-CF7B5CCD5E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EC64833-F9EB-4CE9-996A-CF7B5CCD5E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EC64833-F9EB-4CE9-996A-CF7B5CCD5E8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A4E27EF-3991-4AC6-A100-ADDDC6B289E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A4E27EF-3991-4AC6-A100-ADDDC6B289E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A4E27EF-3991-4AC6-A100-ADDDC6B289E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A4E27EF-3991-4AC6-A100-ADDDC6B289E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC5F613-C2D3-459C-94C2-F55963D0B24B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC5F613-C2D3-459C-94C2-F55963D0B24B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC5F613-C2D3-459C-94C2-F55963D0B24B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC5F613-C2D3-459C-94C2-F55963D0B24B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{579F1D4C-E286-4468-9241-11A47A0BE3B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{579F1D4C-E286-4468-9241-11A47A0BE3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{579F1D4C-E286-4468-9241-11A47A0BE3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{579F1D4C-E286-4468-9241-11A47A0BE3B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

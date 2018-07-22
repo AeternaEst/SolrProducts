@@ -1,0 +1,21 @@
+﻿@model string
+
+<h2>@Model</h2>
+
+<h2 id="di"></h2>
+
+<script>
+    var xmlHttpRequest = new XMLHttpRequest();
+    var baseSearchUrl = 'http://localhost:60768/search/di';
+
+    xmlHttpRequest.addEventListener('load', function (e) {
+        var injectPoint = document.getElementById('di');
+
+        injectPoint.innerHTML = e.target.response;
+    });
+
+    xmlHttpRequest.open('GET', baseSearchUrl);
+
+    xmlHttpRequest.send();
+
+</script>
